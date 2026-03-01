@@ -10,10 +10,6 @@ token = os.environ.get("TOKEN")
 if not token:
     raise Exception("TOKEN not set")
 
-hostname = os.environ.get("HOSTNAME")
-if not hostname:
-    raise Exception("HOSTNAME not set")
-
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -22,10 +18,6 @@ templates = Jinja2Templates(directory="templates")
 @app.middleware("http")
 async def restrict_access(request: Request, call_next):
     allowed_path = f"/{token}"
-
-    request_host = request.headers.get("host", "")
-    if request_host != hostname:
-        return Response(status_code=404)
 
     path = request.url.path
     if path != allowed_path and not path.startswith("/static/"):
