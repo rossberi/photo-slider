@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anthias Slideshow</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <img id="slideshow" src="{{ images[0] }}" />
+
+    <script>
+    const imageList = {{ images | tojson }};
+    let index = 0;
+    const imgElement = document.getElementById("slideshow");
+
+    setInterval(() => {
+        index = (index + 1) % imageList.length;
+        imgElement.src = imageList[index];
+    }, 5000);
+</script>
+</body>
+</html>
