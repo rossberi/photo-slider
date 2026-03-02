@@ -1,11 +1,26 @@
 body {
     margin: 0;
-    background: black;   /* Schwarzer Hintergrund */
+    background: black;
     overflow: hidden;
+    height: 100vh;
+    width: 100%;
 }
 
-#slideshow {
-    width: 100vw;
+.slideshow {
     height: 100vh;
-    object-fit: contain; /* GANZES Bild anzeigen */
+    width: 100%;
+    object-fit: contain;
+
+}
+
+
+.slideshow.blur {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    filter: blur(4rem);
 }

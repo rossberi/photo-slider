@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Anthias Slideshow</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <img id="slideshow" src="{{ images[0] }}" />
+    <head>
+        <title>Anthias Slideshow</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <img class="slideshow" src="{{ images[0] }}" />
+        <img class="slideshow blur" src="{{ images[0] }}" />
 
-    <script>
-    const imageList = {{ images | tojson }};
-    let index = 0;
-    const imgElement = document.getElementById("slideshow");
+        <script>
+            const imageList = {{ images | tojson }};
+            let index = 0;
+            const imgElements = document.getElementsByClassName("slideshow");
 
-    setInterval(() => {
-        index = (index + 1) % imageList.length;
-        imgElement.src = imageList[index];
-    }, 5000);
-</script>
-</body>
+            setInterval(() => {
+                index = (index + 1) % imageList.length;
+                imgElements[0].src = imageList[index];
+                imgElements[1].src = imageList[index];
+            }, {{ interval }});
+        </script>
+    </body>
 </html>
