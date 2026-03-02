@@ -7,8 +7,8 @@ from PIL import Image, ImageOps
 from pathlib import Path
 import os
 import random
-import asyncio
 import shutil
+import asyncio
 
 interval = int(os.getenv("SLIDESHOW_INTERVAL", 10)) * 1000
 THUMB_DIR = Path("static/thumbs")
@@ -20,15 +20,11 @@ def create_thumbnail(src: Path) -> None:
         img = ImageOps.exif_transpose(img)
         if img.mode in ("RGBA", "P", "LA"):
             img = img.convert("RGB")
-        img.thumbnail((2560 , 1440))
+        img.thumbnail((1920, 1080))
         img.save(dest, "JPEG", quality=75, optimize=True, progressive=True)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    shutil.rmtree(THUMB_DIR, ignore_errors=True)
-    THUMB_DIR.mkdir()
-
+async def process_images():
     loop = asyncio.get_event_loop()
     images = [
         f
@@ -37,6 +33,14 @@ async def lifespan(app: FastAPI):
     ]
     for img in images:
         await loop.run_in_executor(None, create_thumbnail, img)
+        await asyncio.sleep(0)  # anderen Tasks Luft lassen
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    shutil.rmtree(THUMB_DIR, ignore_errors=True)
+    THUMB_DIR.mkdir()
+    asyncio.create_task(process_images())  # Im Hintergrund starten
     yield
 
 
@@ -47,6 +51,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    # Nur bereits fertige Thumbs anzeigen
     images = [
         f"/static/thumbs/{f.name}"
         for f in THUMB_DIR.iterdir()
