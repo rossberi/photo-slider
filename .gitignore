@@ -10,3 +10,4 @@ venv/
 
 # Bilder nicht ins Git-Repo
 static/images/*
+static/thumbs/*
