@@ -13,5 +13,6 @@ services:
     environment:
       - TZ=Europe/Berlin
       - SLIDESHOW_INTERVAL=10
+      - USE_THUMBS=true
 networks: {}
 ```

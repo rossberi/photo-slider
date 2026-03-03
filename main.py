@@ -11,16 +11,17 @@ import shutil
 import asyncio
 
 interval = int(os.getenv("SLIDESHOW_INTERVAL", 10)) * 1000
-THUMB_DIR = Path("static/thumbs")
+use_thumbs = os.getenv("USE_THUMBS", "false").lower() == "true"
+thumb_dir = Path("static/thumbs")
 
 
 def create_thumbnail(src: Path) -> None:
-    dest = THUMB_DIR / src.with_suffix(".jpg").name
+    dest = thumb_dir / src.with_suffix(".jpg").name
     with Image.open(src) as img:
         img = ImageOps.exif_transpose(img)
         if img.mode in ("RGBA", "P", "LA"):
             img = img.convert("RGB")
-        img.thumbnail((1920, 1080))
+        img.thumbnail((2560, 1440))
         img.save(dest, "JPEG", quality=75, optimize=True, progressive=True)
 
 
@@ -38,9 +39,10 @@ async def process_images():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    shutil.rmtree(THUMB_DIR, ignore_errors=True)
-    THUMB_DIR.mkdir()
-    asyncio.create_task(process_images())  # Im Hintergrund starten
+    if use_thumbs:
+        shutil.rmtree(thumb_dir, ignore_errors=True)
+        thumb_dir.mkdir()
+        asyncio.create_task(process_images())
     yield
 
 
@@ -48,13 +50,16 @@ app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+if use_thumbs:
+    image_path = thumb_dir
+else:
+    image_path = Path("static/images")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    # Nur bereits fertige Thumbs anzeigen
     images = [
-        f"/static/thumbs/{f.name}"
-        for f in THUMB_DIR.iterdir()
+        f"{image_path}/{f.name}"
+        for f in image_path.iterdir()
         if f.suffix.lower() in (".jpg", ".jpeg", ".png")
     ]
     random.shuffle(images)
