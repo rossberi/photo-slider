@@ -33,9 +33,8 @@ def get_or_create_thumb(img_path: Path) -> str:
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    # Ändere das hier:
     return templates.TemplateResponse(
-        name="index.html", context={"request": request, "interval": INTERVAL}
+        request=request, name="index.html", context={"interval": INTERVAL}
     )
 
 
