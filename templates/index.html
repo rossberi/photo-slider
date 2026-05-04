@@ -1,23 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <title>Foto-Slider</title>
-        <link rel="stylesheet" href="/static/style.css">
-    </head>
-    <body>
-        <img class="slideshow" src="{{ images[0] }}" />
-        <img class="slideshow blur" src="{{ images[0] }}" />
+  <head>
+    <title>Foto-Slider</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <img id="blur-img" class="slideshow blur" />
+    <img id="main-img" class="slideshow" />
 
-        <script>
-            const imageList = {{ images | tojson }};
-            let index = 0;
-            const imgElements = document.getElementsByClassName("slideshow");
+    <script>
+      const imgMain = document.getElementById("main-img");
+      const imgBlur = document.getElementById("blur-img");
+      const interval = {{ interval }};
 
-            setInterval(() => {
-                index = (index + 1) % imageList.length;
-                imgElements[0].src = imageList[index];
-                imgElements[1].src = imageList[index];
-            }, {{ interval }});
-        </script>
-    </body>
+      function next() {
+          const nextImg = new Image();
+          // Der Browser folgt dem Redirect im Hintergrund
+          nextImg.src = `/random-image?c=${Date.now()}`;
+
+          nextImg.onload = () => {
+              imgMain.src = nextImg.src;
+              imgBlur.src = nextImg.src;
+          };
+      }
+
+      // Erster Aufruf und Intervall
+      next();
+      setInterval(next, interval);
+    </script>
+  </body>
 </html>

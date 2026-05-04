@@ -14,6 +14,7 @@ body {
     height: 100vh;
     width: 100%;
     object-fit: contain;
+    transition: opacity 1s ease-in-out;
 
 }
 
