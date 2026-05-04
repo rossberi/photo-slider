@@ -3,7 +3,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
@@ -31,10 +31,11 @@ def get_or_create_thumb(img_path: Path) -> str:
     return f"/static/thumbs/{thumb_path.name}"
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    # Ändere das hier:
     return templates.TemplateResponse(
-        "index.html", {"request": request, "interval": INTERVAL}
+        name="index.html", context={"request": request, "interval": INTERVAL}
     )
 
 
